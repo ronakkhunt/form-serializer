@@ -1,0 +1,23 @@
+{
+  "name": "form-serializer",
+  "version": "0.0.1",
+  "description": "A Simple jQuery plug-in that helps searilizing the forms in better yet simplest way possible.",
+  "main": "form-serializer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ronakkhunt/form-serializer.git"
+  },
+  "author": "Ronak Khunt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ronakkhunt/form-serializer/issues"
+  },
+  "homepage": "https://github.com/ronakkhunt/form-serializer#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-uglify": "^2.2.0"
+  }
+}
