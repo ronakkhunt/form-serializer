@@ -6,8 +6,8 @@ module.exports = function(grunt) {
         banner: '/*! <%= pkg.name %> - <%= pkg.version %> */\n'
       },
       build: {
-        src: 'src/<%= pkg.name %>.js',
-        dest: 'dist/<%= pkg.name %>.min.js'
+        src: 'src/fs-jquery-plugin.js',
+        dest: 'dist/fs-jquery-plugin.min.js'
       }
     }
   });

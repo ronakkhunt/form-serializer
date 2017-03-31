@@ -46,13 +46,29 @@
 			/** Returns the serialized form as QueryString.
 				if joinMultipleParam is true, then it will join value of all the fields with same name with ','
 			*/
-			/*Not Implemented Yet*/
+			if(joinMultipleParam) {
+				var serializedString = "";
+				for(var key in this.serialized) {
+					var value = this.serialized[key]
+					
+					if(typeof(value) == "string") { //single value
+						serializedString += ("&"+key+"="+value);
+					} else if(typeof(value) == "object") { // multiple values
+						serializedString += ("&"+key+"="+value.join(","));
+					}
+				}
+				return serializedString.substring(1);
+			}
 		}
-		this.populate = function(jsonDataObj) {
+		this.populate = function(formEl, dataObjectOrQueryString) {
 			/** De-serializer
 				Fill the value of fields in given form with given JSON object.
 			*/
-			/*Not Implemented Yet*/
+			if("string" == typeof(dataObjectOrQueryString)) { //query String
+				//todo
+			} else if("object" == typeof(dataObjectOrQueryString)) { // JSON Object
+				//todo
+			}
 		}
 	};
 	var serializer = new Serializer();
@@ -60,10 +76,18 @@
 	$.fn.getAsJson = function() {
 		serializer.serialize(this);
 		return serializer.getAsJson();
-	}
+	};
 	
-	$.fn.getAsQueryString = function() {
-		serializer.serialize(this);
-		return serializer.getAsQueryString();
-	}
+	$.fn.getAsQueryString = function(joinMultipleParam) {
+		if(joinMultipleParam) {
+			serializer.serialize(this);
+			return serializer.getAsQueryString(true);	
+		}
+		return this.serialize(); //using jQuery's default serialize() implementation.
+	};
+	
+	// $.fn.populate = function(dataObjectOrQueryString) {
+		// serialize.populate(this, dataObjectOrQueryString)
+	// }
+
 }(jQuery))
