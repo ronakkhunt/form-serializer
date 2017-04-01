@@ -10,7 +10,12 @@
 			
 			form.find(this.config.inputSelector).each(function(index, value){
 				var el = $(value);
-				var key = el.attr('name').trim();
+				var key = el.attr('name');
+				
+				//if name attribute is not defined then return;
+				if(!key) return;
+
+				key = key.trim();
 				
 				var value = el.val().trim();
 				//check if it is dropdown
@@ -18,7 +23,7 @@
 				{
 					serializedForm[key] = value;	
 				} else {
-					var type = el.attr('type').trim();
+					var type = (el.attr('type') || "text").trim();
 					if(type === "radio") {
 						if(el.is(':checked')) {
 							serializedForm[key] = value;		
@@ -49,7 +54,7 @@
 			if(joinMultipleParam) {
 				var serializedString = "";
 				for(var key in this.serialized) {
-					var value = this.serialized[key]
+					var value = encodeURIComponent(this.serialized[key])
 					
 					if(typeof(value) == "string") { //single value
 						serializedString += ("&"+key+"="+value);
