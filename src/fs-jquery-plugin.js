@@ -38,7 +38,6 @@
 						serializedForm[key] = value;
 					}
 				}
-					
 			});
 			this.serialized = serializedForm;
 		}
@@ -54,12 +53,33 @@
 			if(joinMultipleParam) {
 				var serializedString = "";
 				for(var key in this.serialized) {
+					/**
+						In case of array of string: encodeURIComponent() will automatically
+						convert it into string separeted by comma(',')
+
+						e.g: ["value1", "value2"] --> "value1%2Cvalue2"
+					*/
 					var value = encodeURIComponent(this.serialized[key])
 					
 					if(typeof(value) == "string") { //single value
 						serializedString += ("&"+key+"="+value);
 					} else if(typeof(value) == "object") { // multiple values
-						serializedString += ("&"+key+"="+value.join(","));
+						serializedString += ("&"+key+"="+value);
+					}
+				}
+				return serializedString.substring(1);
+			} else {
+				var serializedString = "";
+				for(var key in this.serialized) {
+					var value = this.serialized[key];
+					if(typeof(value) == "string") { //single value
+						value = encodeURIComponent(value);
+						serializedString += ("&"+key+"="+value);
+					} else if(typeof(value) == "object") { // multiple values
+						for(var v in value) { // convertion of multiple values to multiple (key=value) pairs
+							v = encodeURIComponent(v);
+							serializedString += ("&"+key+"="+v);
+						}
 					}
 				}
 				return serializedString.substring(1);
@@ -76,21 +96,45 @@
 			}
 		}
 	};
-	var serializer = new Serializer();
 	
-	$.fn.getAsJson = function() {
-		serializer.serialize(this);
-		return serializer.getAsJson();
-	};
-	
-	$.fn.getAsQueryString = function(joinMultipleParam) {
-		if(joinMultipleParam) {
-			serializer.serialize(this);
-			return serializer.getAsQueryString(true);	
+	//Saving jQuery's default "serialize()" implementation()
+	$.fn._serialize_default = $.fn.serialize;
+
+	$.fn.serialize = function(options) {
+
+		if(!options) return this._serialize_default();
+
+		var settings = {
+			type: "",
+			inputSelector: ":input"
 		}
-		return this.serialize(); //using jQuery's default serialize() implementation.
+
+		if("object" == typeof(options)) {
+			$.extend(settings, options);
+		} else if ("string" == typeof(options)) {
+			$.extend(settings, {type: options});
+		}
+
+		var serializer = new Serializer({inputSelector: settings.inputSelector});
+		serializer.serialize(this);
+		
+		//if type is not defined the we will return normal serialize response, but if custome
+		//`inputSelector` is defined then we can not use jQuery's default implementation.
+		if(!settings.type && settings.inputSelector != ":input") 
+			return serializer.getAsQueryString(false)
+		else if(!settings.type && settings.inputSelector == ":input") 
+			return this._serialize_default(); //using jQuery's default implementation
+
+		if(settings.type) {
+			var stringConfigMap = {
+				'json': serializer.getAsJson,
+				'queryString': serializer.getAsQueryString
+			}
+			// 'true' argument here is for "serializer.getAsQueryString" only.
+			return stringConfigMap[settings.type].call(serializer, true);
+		};
 	};
-	
+
 	// $.fn.populate = function(dataObjectOrQueryString) {
 		// serialize.populate(this, dataObjectOrQueryString)
 	// }
