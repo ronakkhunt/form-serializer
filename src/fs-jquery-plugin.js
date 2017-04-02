@@ -102,7 +102,16 @@
 
 	$.fn.serialize = function(options) {
 
-		if(!options) return this._serialize_default();
+		//Getting first form element from collection fo selected elements.
+		var formEl = null;
+		this.filter('form').each(function() {
+			formEl = $(this);
+			return false;
+		})
+
+		if(!formEl) return;
+
+		if(!options) return formEl._serialize_default();
 
 		var settings = {
 			type: "",
@@ -116,14 +125,14 @@
 		}
 
 		var serializer = new Serializer({inputSelector: settings.inputSelector});
-		serializer.serialize(this);
+		serializer.serialize(formEl);
 		
 		//if type is not defined the we will return normal serialize response, but if custome
 		//`inputSelector` is defined then we can not use jQuery's default implementation.
 		if(!settings.type && settings.inputSelector != ":input") 
 			return serializer.getAsQueryString(false)
 		else if(!settings.type && settings.inputSelector == ":input") 
-			return this._serialize_default(); //using jQuery's default implementation
+			return formEl._serialize_default(); //using jQuery's default implementation
 
 		if(settings.type) {
 			var stringConfigMap = {

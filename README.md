@@ -3,6 +3,8 @@ form-serializer
 
 A Simple jQuery plug-in that helps serializing the forms in better yet simplest way possible.
 
+>**Note:** Incase when there is multiple form elements are selected, it will only serialize the first form element.
+
 Usages:
 -------
 **1) Get form data as JSON Object** (by passing `type` as **json**).
