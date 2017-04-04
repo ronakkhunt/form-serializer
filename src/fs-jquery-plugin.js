@@ -18,8 +18,10 @@
 				key = key.trim();
 				
 				var value = el.val().trim();
+				
+				/* <-- http://stackoverflow.com/questions/11416261/how-can-i-check-if-an-element-is-a-drop-down-list-element-or-a-text-input-elemen*/ 
 				//check if it is dropdown
-				if(el.is('select'))/* <-- http://stackoverflow.com/questions/11416261/how-can-i-check-if-an-element-is-a-drop-down-list-element-or-a-text-input-elemen*/ 
+				if(el.is('select'))
 				{
 					serializedForm[key] = value;	
 				} else {
@@ -55,7 +57,7 @@
 				for(var key in this.serialized) {
 					/**
 						In case of array of string: encodeURIComponent() will automatically
-						convert it into string separeted by comma(',')
+						convert it into string separated by comma(',')
 
 						e.g: ["value1", "value2"] --> "value1%2Cvalue2"
 					*/
@@ -85,21 +87,72 @@
 				return serializedString.substring(1);
 			}
 		}
-		this.populate = function(formEl, dataObjectOrQueryString) {
+		this.populate = function(formEl, dataObjectOrQueryString, options) {
 			/** De-serializer
 				Fill the value of fields in given form with given JSON object.
 			*/
+			
+			var separateMultiParam = options.separateMultiParam;
+
+			var jsonData = dataObjectOrQueryString;
+			
 			if("string" == typeof(dataObjectOrQueryString)) { //query String
-				//todo
-			} else if("object" == typeof(dataObjectOrQueryString)) { // JSON Object
-				//todo
+				var params = dataObjectOrQueryString.split("&");
+				var convertedJson = {}
+				for(var i = 0; i < params.length; i++) {
+					var temp = params[i].split("=");
+					var key, value
+					if(temp.length > 0) key = temp[0]
+					if(temp.length > 1) value = decodeURIComponent(temp[1]);
+
+					if(value){
+						var existingArray  = convertedJson[key] || []
+							
+						if(separateMultiParam) {
+							existingArray = existingArray.concat(value.split(','))
+						} else
+							existingArray.push(value);
+						
+						convertedJson[key] = existingArray
+					}
+						
+				}
+				jsonData = convertedJson;
 			}
+
+			formEl.find(this.config.inputSelector).each(function(index, value){
+				var el = $(value);
+				var key = el.attr('name');
+				
+				//if name attribute is not defined then return;
+				if(!key) return;
+
+				key = key.trim();
+				
+				var value = jsonData[key]
+
+				var type = (el.attr('type') || "text").trim();
+				if(type === "radio") {
+					if(el.val() == value) {
+						el.attr("checked", "checked");		
+					}
+				} else if(type === "checkbox") {
+					if(value.indexOf(el.val()) > -1) {
+						el.attr("checked", "checked");	
+					}
+				} else {
+					el.val(value.slice(-1));
+				}
+
+			});
 		}
 	};
 	
 	//Saving jQuery's default "serialize()" implementation()
 	$.fn._serialize_default = $.fn.serialize;
 
+
+	//TODO: get as 'FormData' object can be added
 	$.fn.serialize = function(options) {
 
 		//Getting first form element from collection fo selected elements.
@@ -111,7 +164,7 @@
 
 		if(!formEl) return;
 
-		if(!options) return formEl._serialize_default();
+		if(!options) return formEl._serialize_default(); //using jQuery's default implementation
 
 		var settings = {
 			type: "",
@@ -144,8 +197,22 @@
 		};
 	};
 
-	// $.fn.populate = function(dataObjectOrQueryString) {
-		// serialize.populate(this, dataObjectOrQueryString)
-	// }
+	$.fn.populate = function(dataObjectOrQueryString, options) {
+		
+		if(!dataObjectOrQueryString) return;
+
+		var settings = {
+			inputSelector: ":input",
+			separateMultiParam: false
+		}
+
+		if("object" == typeof(options)) {
+			$.extend(settings, options);
+		}
+
+		var serializer = new Serializer({inputSelector: settings.inputSelector});
+		serializer.populate(this, dataObjectOrQueryString, settings)
+		return this;
+	}
 
 }(jQuery))
