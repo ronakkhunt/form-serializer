@@ -53,10 +53,11 @@ You can also set **custom elements selector** inside a **Form**.
 ```javascript
 	$('#formId').populate(queryString);
 ```
-**Populate/Fill Form with QueryString Object**
+You can pass `inputSelector` to populate custom selected elements.
 ```javascript
-	/* If you have multiple values in comma separated manner in query 
-	param (e.g. serialized with $('#formId').serialize('queryString')), 
-	you can use this option. */
-	$('#formId').populate(queryString, {"separateMultiParam": true});
+	$('#formId').populate(queryString, {inputSelector: "input[type='text']"});
+```
+If you have multiple values in **comma separated manner** in query param (e.g. Serialized with **$('#formId').serialize('queryString')**), you need set `separateMultiParam` option to true for populate() to work.
+```javascript
+	$('#formId').populate(queryString, {separateMultiParam: true});
 ```

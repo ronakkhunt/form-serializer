@@ -1,6 +1,6 @@
 {
   "name": "form-serializer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Simple jQuery plug-in that helps searilizing the forms in better yet simplest way possible.",
   "main": "form-serializer.js",
   "scripts": {
