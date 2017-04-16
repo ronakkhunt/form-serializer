@@ -1,12 +1,14 @@
 (function($){
 	var Serializer = function (config) {
 		this.config = config || {
-			inputSelector: ":input"
+			inputSelector: ":input",
+			serializeDisabled: false
 		}
 		this.serialized = null;
 		
 		this.serialize = function(form) {
-			var serializedForm = {}
+			var self = this
+			,serializedForm = {};
 			
 			form.find(this.config.inputSelector).each(function(index, value){
 				var el = $(value);
@@ -14,6 +16,9 @@
 				
 				//if name attribute is not defined then return;
 				if(!key) return;
+
+				//if element is disabled then return;
+				if(el.is(':disabled') && !self.config.serializeDisabled) return;
 
 				key = key.trim();
 				
@@ -168,7 +173,8 @@
 
 		var settings = {
 			type: "",
-			inputSelector: ":input"
+			inputSelector: ":input",
+			serializeDisabled: false
 		}
 
 		if("object" == typeof(options)) {
@@ -177,7 +183,10 @@
 			$.extend(settings, {type: options});
 		}
 
-		var serializer = new Serializer({inputSelector: settings.inputSelector});
+		var serializer = new Serializer({
+			inputSelector: settings.inputSelector,
+			serializeDisabled: settings.serializeDisabled
+		});
 		serializer.serialize(formEl);
 		
 		//if type is not defined the we will return normal serialize response, but if custome

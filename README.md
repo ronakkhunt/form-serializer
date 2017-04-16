@@ -42,6 +42,10 @@ You can also set **custom elements selector** inside a **Form**.
 	//serialize only `input` tags' value which has type="text"
 	$('#formId').serialize({type: 'queryString', inputSelector: 'input[type="text"]'}); 
 ```
+You can also serialize `disabled` elements by setting `serializeDisabled` as `true`.
+```javascript
+	$('#formId').serialize({type: 'queryString', serializeDisabled: true}); 
+```
 **populate()**
 --------------
 
